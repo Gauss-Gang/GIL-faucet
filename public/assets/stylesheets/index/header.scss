@@ -3,10 +3,26 @@
   position: absolute;
   z-index: 1;
   top: 0;
-  padding: 18px 10px;
-  background-image: url(../images/bg_header.png);
+  padding: 10px;
+  background: 
+    linear-gradient(90deg, #5f003e, #df545a);
+  animation: gradientBG 10s ease infinite;
+  background-size: 250% 250%;
   background-repeat: no-repeat;
-  background-size: cover;
+
+  @keyframes gradientBG {
+    0% {
+      background-position: 0% 50%;
+    }
+  
+    50% {
+      background-position: 100% 50%;
+    }
+  
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 
   &-settings {
     float: right;
@@ -20,12 +36,11 @@
   }
 
   &-logo {
-    @include image-2x('../images/faucet_top@2x.png', 182px, 35px);
-    float: left;
+    @include image-2x('../images/faucet_top@2x.png', 182px, 57px);
+    float: right;
     width: 182px;
-  	height: 35px;
+  	height: 57px;
     background-image: url(../images/faucet_top.png);
-    background-position: -54px 0;
     background-repeat: no-repeat;
   }
 
@@ -35,4 +50,11 @@
     float: right;
     margin-top: 3px;
   }
+}
+
+.center-logo-img {
+  display: block;
+  margin: 5px auto;
+  max-width: 50%;
+  max-height: 57px;
 }

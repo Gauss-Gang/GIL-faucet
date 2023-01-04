@@ -42,7 +42,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: fade-out(#231d73, 0.2);
+    background-color: fade-out(#df545a, 0.2);
   }
 
   &-i {
@@ -55,7 +55,7 @@
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background-color: #fff;
+    background-color: white;
 
     &:nth-child(2) {
       animation-delay: .1s;

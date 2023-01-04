@@ -3,13 +3,29 @@
   position: absolute;
   bottom: 0;
   height: $footer-height;
-  background-image: url(../images/bg_footer.png);
-  background-size: cover;
+  background: 
+   linear-gradient(90deg, #5f003e, #df545a);
+  animation: gradientBG 10s ease infinite;
+  background-size: 250% 250%;
   background-position: center center;
   color: #fff;
 
   @media screen and (max-width: $tablet-width) {
     height: $footer-height + 20px;
+  }
+
+  @keyframes gradientBG {
+    0% {
+      background-position: 0% 50%;
+    }
+  
+    50% {
+      background-position: 100% 50%;
+    }
+  
+    100% {
+      background-position: 0% 50%;
+    }
   }
 
   .container {
@@ -30,14 +46,13 @@
   }
 
   .logo {
-    @include image-2x('../images/FAUCET_footer@2x.png', 126px, 24px);
+    @include image-2x('../images/FAUCET_footer@2x.png', 126px, 26px);
     z-index: 2;
     display: inline-block;
     vertical-align: middle;
     width: 126px;
-    height: 24px;
+    height: 26px;
     background-image: url(../images/FAUCET_footer.png);
-    background-position: -37px 0;
     background-repeat: no-repeat;
   }
 
