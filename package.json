@@ -1,7 +1,7 @@
 {
-  "name": "poa-network-sokol-faucet",
+  "name": "gauss-netwrok-faucet",
   "version": "1.0.2",
-  "description": "Sokol tetnet POA Network faucet",
+  "description": "GAUSS NETWORK FAUCET",
   "main": "index.js",
   "scripts": {
     "start": "npm run sass && npm run coffee && node index.js",
@@ -9,14 +9,11 @@
     "coffee": "gulp javascript",
     "watch": "gulp watch"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://git.heroku.com/faucet-sokol.git"
-  },
-  "author": "poanetwork",
+  "author": "GAUSS NETWORK",
   "license": "MIT",
   "dependencies": {
     "body-parser": "1.19.0",
+    "ethereumjs-tx": "^2.1.2",
     "express": "4.18.1",
     "gulp": "^3.9.1",
     "gulp-add-src": "^0.2.0",
@@ -41,6 +38,6 @@
     "graceful-fs": "^4.2.10"
   },
   "engines": {
-    "node": "16.16.0"
+    "node": "18.x"
   }
 }
