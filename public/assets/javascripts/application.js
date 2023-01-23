@@ -28,7 +28,7 @@ $(function() {
 			$("#receiver").val('');
 			loader.addClass("hidden");
 			swal("Success",
-			  `1 GANG has been successfully transferred to <a href="https://blockscout.com/poa/sokol/tx/${data.success.txHash}" target="blank">${receiver}</a>`,
+			  `1 GANG has been successfully transferred to <a href="https://explorer.giltestnet.com/tx/${data.success.txHash}" target="blank">${receiver}</a>`,
 			  "success"
 			);
 		}).fail(function(err) {
