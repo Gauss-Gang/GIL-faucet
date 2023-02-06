@@ -27,7 +27,7 @@
     "etherToTransfer": "The number of milliEther to be sent from the faucet. For example, 500",
     "gasLimit": "Transaction gas limit, for example, 21000",
     "prod": {
-      "rpc": "JSON RPC endpoint. For example, https://core.poa.network",
+      "rpc": "JSON RPC endpoint. For example, https://rpc.giltestnet.com",
       "account": "The address from which the funds will be drained",
       "privateKey": "Private key of the account"
     },
