@@ -96,9 +96,7 @@ module.exports = function (app) {
 		let txHash
 		web3.eth.sendTransaction(tx)
 		.on('transactionHash', (_txHash) => {
-			console.log(_txHash)
 			txHash = _txHash
-			console.log("txHash", txHash)
 		})
 		.on('receipt', (receipt) => {
 			debug(isDebug, receipt)
