@@ -27,6 +27,10 @@
     margin-bottom: 20px;
   }
 
+  select {
+    margin-bottom: 20px;
+  }
+
   &-button {
     @extend %btn;
     display: inline-block;
