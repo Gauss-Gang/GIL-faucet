@@ -14,31 +14,7 @@ const tokenAddresses = {
 	"xNOBLE": "0x128BD023f6F99cB0fD3a061e7541076d4f634b14"
 }
 
-const contractABI = [
-	// transfer
-	{
-	  "constant": false,
-	  "inputs": [
-		{
-		  "name": "_to",
-		  "type": "address"
-		},
-		{
-		  "name": "_value",
-		  "type": "uint256"
-		}
-	  ],
-	  "name": "transfer",
-	  "outputs": [
-		{
-		  "name": "",
-		  "type": "bool"
-		}
-	  ],
-	  "type": "function"
-	},
-	// Other functions like balanceOf, totalSupply, etc.
-];
+const contractABI = [{"type":"constructor","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"allowance","inputs":[{"type":"address","name":"owner","internalType":"address"},{"type":"address","name":"spender","internalType":"address"}]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"approve","inputs":[{"type":"address","name":"spender","internalType":"address"},{"type":"uint256","name":"amount","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"balanceOf","inputs":[{"type":"address","name":"account","internalType":"address"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint8","name":"","internalType":"uint8"}],"name":"decimals","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"decreaseAllowance","inputs":[{"type":"address","name":"spender","internalType":"address"},{"type":"uint256","name":"subtractedValue","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"increaseAllowance","inputs":[{"type":"address","name":"spender","internalType":"address"},{"type":"uint256","name":"addedValue","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"string","name":"","internalType":"string"}],"name":"name","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"string","name":"","internalType":"string"}],"name":"symbol","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"totalSupply","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"transfer","inputs":[{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"amount","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"transferFrom","inputs":[{"type":"address","name":"from","internalType":"address"},{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"amount","internalType":"uint256"}]},{"type":"event","name":"Approval","inputs":[{"type":"address","name":"owner","indexed":true},{"type":"address","name":"spender","indexed":true},{"type":"uint256","name":"value","indexed":false}],"anonymous":false},{"type":"event","name":"Transfer","inputs":[{"type":"address","name":"from","indexed":true},{"type":"address","name":"to","indexed":true},{"type":"uint256","name":"value","indexed":false}],"anonymous":false}]
 
 module.exports = function (app) {
 	const config = app.config
@@ -154,24 +130,18 @@ module.exports = function (app) {
 		} else {
 			const tokenContract = new web3.eth.Contract(contractABI, tokenAddresses[token]);
 
-			const tx = {
+			tokenContract.methods.transfer(receiver, ethToSend).send({
 				from: account.address,
-				to: tokenAddresses[token],
-				data: tokenContract.methods.transfer(receiver, ethToSend).encodeABI(),
-				nonce: nonceHex,
+				gas: gasLimitHex,
 				gasPrice: gasPriceHex,
-				gasLimit: gasLimitHex,
-			};
-			
-			const signedTx = await web3.eth.accounts.signTransaction(tx, senderPrivateKey);
-			
-			web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-			.on('transactionHash', (_txHash) => {
-				txHash = _txHash
+				nonce: nonceHex
 			})
-			.on('receipt', (receipt) => {
+			.on('transactionHash', function(hash){
+				txHash = hash
+			})
+			.on('confirmation', function(confirmationNumber, receipt){
 				debug(isDebug, receipt)
-				if (receipt.status == '0x1') {
+				if (receipt.status == true) { // you should use boolean true instead of '0x1'
 					return sendRawTransactionResponse(txHash, response)
 				} else {
 					const error = {
@@ -180,9 +150,7 @@ module.exports = function (app) {
 					return generateErrorResponse(response, error);
 				}
 			})
-			.on('error', (error) => {
-				return generateErrorResponse(response, error)
-			});
+			.on('error', console.error); // If an out of gas error, the second parameter is the receipt.
 		}
 	}
 

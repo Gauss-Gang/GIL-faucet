@@ -28,16 +28,57 @@
   }
 
   select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     margin-bottom: 20px;
+    width: 100%;
+    background: linear-gradient(45deg, #992579, #df545a);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0px 5px 7px -4px #000000;
+    font-size: 18px;
+    transition: all 0.3s;
+    padding: 10px 30px 10px 10px;
+    position: relative;
+  }
+
+  select:focus {
+      outline: none;
+      box-shadow: 0 0 10px 4px #992579;
+  }
+
+  select:hover {
+      opacity: 0.9;
+  }
+  
+  select option {
+    color: #000;
+    background-color: #fff; /* optional, adds a background color to options */
+  }
+
+  /* Custom dropdown arrow */
+  select:after {
+      content: "\25BC";
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 12px;
+      background: #992579;
+      cursor: pointer;
+      pointer-events: none;
+      transition: 0.25s all ease;
   }
 
   &-button {
     @extend %btn;
     display: inline-block;
-    background-color: #5f003e;
+    background: linear-gradient(45deg, #992579, #df545a);
+    transition: all 0.3s;
 
     &:hover {
-      background-color: #df545a;
+      background: linear-gradient(45deg, #df545a, #992579);
     }
   }
 }
