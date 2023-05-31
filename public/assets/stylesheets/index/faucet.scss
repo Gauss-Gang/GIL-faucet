@@ -14,6 +14,8 @@
   @extend %item;
   padding: 30px;
   display: inline-block;
+  border: 1px solid lightgray;  // Adding border here
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);  // Adding shadow here
 
   h1 {
     @extend %title;
