@@ -1,7 +1,20 @@
-const EthereumTx = require('ethereumjs-tx')
+const EthereumTx = require('ethereumjs-tx').Transaction
 const { generateErrorResponse } = require('../helpers/generate-response')
 const  { validateCaptcha } = require('../helpers/captcha-helper')
 const { debug } = require('../helpers/debug')
+
+const tokenAddresses = {
+	"NOBLE": "0xFA4844cc662F4b509BDb752E249F9c729971FA29",
+	"CTT": "0xb06E20B0F3aA014F3Bf50cb3FA1e5C15113A30F0",
+	"DGT": "0x3974a70DB923C995c1F4E0841604856F28B1BeA7",
+	"DKT": "0xFDB28f6C5d8daB66b7fda0D66c09aF24425017Af",
+	"FTT": "0x760A8A3b52a28eE55db35cd69F616970863ec2d5",
+	"SHT": "0xAa42C73a0ef2ab7115369C0cCa5664Cf77F4b365",
+	"wGANG": "0x35A04074b062ECfA9DB4070A8f1d5aF35Dcf0699",
+	"xNOBLE": "0x128BD023f6F99cB0fD3a061e7541076d4f634b14"
+}
+
+const contractABI = [{"type":"constructor","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"allowance","inputs":[{"type":"address","name":"owner","internalType":"address"},{"type":"address","name":"spender","internalType":"address"}]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"approve","inputs":[{"type":"address","name":"spender","internalType":"address"},{"type":"uint256","name":"amount","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"balanceOf","inputs":[{"type":"address","name":"account","internalType":"address"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint8","name":"","internalType":"uint8"}],"name":"decimals","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"decreaseAllowance","inputs":[{"type":"address","name":"spender","internalType":"address"},{"type":"uint256","name":"subtractedValue","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"increaseAllowance","inputs":[{"type":"address","name":"spender","internalType":"address"},{"type":"uint256","name":"addedValue","internalType":"uint256"}]},{"type":"function","stateMutability":"view","outputs":[{"type":"string","name":"","internalType":"string"}],"name":"name","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"string","name":"","internalType":"string"}],"name":"symbol","inputs":[]},{"type":"function","stateMutability":"view","outputs":[{"type":"uint256","name":"","internalType":"uint256"}],"name":"totalSupply","inputs":[]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"transfer","inputs":[{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"amount","internalType":"uint256"}]},{"type":"function","stateMutability":"nonpayable","outputs":[{"type":"bool","name":"","internalType":"bool"}],"name":"transferFrom","inputs":[{"type":"address","name":"from","internalType":"address"},{"type":"address","name":"to","internalType":"address"},{"type":"uint256","name":"amount","internalType":"uint256"}]},{"type":"event","name":"Approval","inputs":[{"type":"address","name":"owner","indexed":true},{"type":"address","name":"spender","indexed":true},{"type":"uint256","name":"value","indexed":false}],"anonymous":false},{"type":"event","name":"Transfer","inputs":[{"type":"address","name":"from","indexed":true},{"type":"address","name":"to","indexed":true},{"type":"uint256","name":"value","indexed":false}],"anonymous":false}]
 
 module.exports = function (app) {
 	const config = app.config
@@ -16,6 +29,7 @@ module.exports = function (app) {
 
 	app.post('/', async function(request, response) {
 		const isDebug = app.config.debug
+		const token = request.body.token;
 		debug(isDebug, "REQUEST:")
 		debug(isDebug, request.body)
 		const recaptureResponse = request.body["g-recaptcha-response"]
@@ -34,7 +48,7 @@ module.exports = function (app) {
 		}
 		const receiver = request.body.receiver
 		if (await validateCaptchaResponse(captchaResponse, receiver, response)) {
-			await sendPOAToRecipient(web3, receiver, response, isDebug)
+			await sendPOAToRecipient(web3, receiver, response, isDebug, token)
 		}
 	});
 
@@ -66,7 +80,7 @@ module.exports = function (app) {
 		return true
 	}
 
-	async function sendPOAToRecipient(web3, receiver, response, isDebug) {
+	async function sendPOAToRecipient(web3, receiver, response, isDebug, token) {
 		let senderPrivateKey = config.Ethereum[config.environment].privateKey
 		const privateKeyHex = Buffer.from(senderPrivateKey, 'hex')
 		if (!web3.utils.isAddress(receiver)) {
@@ -80,39 +94,64 @@ module.exports = function (app) {
 		const nonceHex = web3.utils.toHex(nonce)
 		const BN = web3.utils.BN
 		const ethToSend = web3.utils.toWei(new BN(config.Ethereum.milliEtherToTransfer), "milliether")
-		const rawTx = {
-		  nonce: nonceHex,
-		  gasPrice: gasPriceHex,
-		  gasLimit: gasLimitHex,
-		  to: receiver, 
-		  value: ethToSend,
-		  data: '0x00'
-		}
-
-		const tx = new EthereumTx(rawTx)
-		tx.sign(privateKeyHex)
-
-		const serializedTx = tx.serialize()
-
+		const account = web3.eth.accounts.privateKeyToAccount('0x' + senderPrivateKey);
+		web3.eth.accounts.wallet.add(account);
+		web3.eth.defaultAccount = account.address;
 		let txHash
-		web3.eth.sendSignedTransaction("0x" + serializedTx.toString('hex'))
-		.on('transactionHash', (_txHash) => {
-			txHash = _txHash
-		})
-		.on('receipt', (receipt) => {
-			debug(isDebug, receipt)
-			if (receipt.status == '0x1') {
-				return sendRawTransactionResponse(txHash, response)
-			} else {
-				const error = {
-					message: messages.TX_HAS_BEEN_MINED_WITH_FALSE_STATUS,
-				}
-				return generateErrorResponse(response, error);
+
+		if (token === 'GANG') {
+			const tx = {
+				nonce: nonceHex,
+				gasPrice: gasPriceHex,
+				gas: gasLimitHex,
+				to: receiver, 
+				value: ethToSend,
+				data: '0x00'
 			}
-		})
-		.on('error', (error) => {
-			return generateErrorResponse(response, error)
-		});
+
+			web3.eth.sendTransaction(tx)
+			.on('transactionHash', (_txHash) => {
+				txHash = _txHash
+			})
+			.on('receipt', (receipt) => {
+				debug(isDebug, receipt)
+				if (receipt.status == '0x1') {
+					return sendRawTransactionResponse(txHash, response)
+				} else {
+					const error = {
+						message: messages.TX_HAS_BEEN_MINED_WITH_FALSE_STATUS,
+					}
+					return generateErrorResponse(response, error);
+				}
+			})
+			.on('error', (error) => {
+				return generateErrorResponse(response, error)
+			});
+		} else {
+			const tokenContract = new web3.eth.Contract(contractABI, tokenAddresses[token]);
+
+			tokenContract.methods.transfer(receiver, ethToSend).send({
+				from: account.address,
+				gas: gasLimitHex,
+				gasPrice: gasPriceHex,
+				nonce: nonceHex
+			})
+			.on('transactionHash', function(hash){
+				txHash = hash
+			})
+			.on('confirmation', function(confirmationNumber, receipt){
+				debug(isDebug, receipt)
+				if (receipt.status == true) { // you should use boolean true instead of '0x1'
+					return sendRawTransactionResponse(txHash, response)
+				} else {
+					const error = {
+						message: messages.TX_HAS_BEEN_MINED_WITH_FALSE_STATUS,
+					}
+					return generateErrorResponse(response, error);
+				}
+			})
+			.on('error', console.error); // If an out of gas error, the second parameter is the receipt.
+		}
 	}
 
 	function sendRawTransactionResponse(txHash, response) {

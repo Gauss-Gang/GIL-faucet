@@ -19,19 +19,41 @@
     </header>
     <section class="content">
       <form action="/" method="POST" id="faucetForm">
-        <div class="request-tokens">
-          <h1>Gauss Induction Labs Faucet</h1>
-            <input type="text" id="receiver" name="receiver" />
-            <h2>
-              Please enter your wallet address above to recieve 1 test GANG Coin.
-            </h2>
-            <button type="submit" id="requestTokens" class="request-tokens-button">Request 1 GANG</button>
-            <div class="text-xs-center">
-              <div class="g-recaptcha" data-sitekey="6Lf7-BsjAAAAAPCGlbDO6K3ALARa9L_Tdq9c0FWR"></div>
-            </div>
-        </div>
+          <div class="request-tokens">
+              <h1>Gauss Induction Labs Faucet</h1>
+              <select id="token" name="token" onchange="updateButtonText()">
+                  <option value="GANG">GANG</option>
+                  <option value="CTT">Cat Token</option>
+                  <option value="DGT">Dog Token</option>
+                  <option value="DKT">Duck Token</option>
+                  <option value="FTT">Ferret Token</option>
+                  <option value="SHT">Sloth Token</option>
+              </select>
+              <input type="text" id="receiver" name="receiver" />
+              <h2>
+                  Please enter your wallet address above to receive 1 test token.
+              </h2>
+              <button type="submit" id="requestTokens" class="request-tokens-button">Request 1 GANG</button>
+              <div class="text-xs-center">
+                  <div class="g-recaptcha" data-sitekey="6Lf7-BsjAAAAAPCGlbDO6K3ALARa9L_Tdq9c0FWR"></div>
+              </div>
+          </div>
       </form>
     </section>
+  
+    <script>
+        function updateButtonText() {
+            let tokenSelect = document.getElementById('token');
+            let tokenButton = document.getElementById('requestTokens');
+            let selectedToken = tokenSelect.options[tokenSelect.selectedIndex].text;
+            tokenButton.innerText = 'Request 1 ' + selectedToken;
+        }
+    
+        // Call the function at start to update the initial button text
+        window.onload = function() {
+            updateButtonText();
+        };
+    </script>
     <div class="loading-container hidden">
       <div class="loading">
         <div class="loading-i"></div>

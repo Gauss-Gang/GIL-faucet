@@ -5,6 +5,8 @@ $(function() {
     	$this = $(this);
 		loader.removeClass("hidden");
 		var receiver = $("#receiver").val();
+		var selectedToken = $('#token option:selected').text();
+
 		$.ajax({
 		  	url:"/",
 		  	type:"POST",
@@ -22,7 +24,7 @@ $(function() {
 			$("#receiver").val('');
 			loader.addClass("hidden");
 			swal("Success",
-			  `1 GANG has been successfully transferred to <a href="https://explorer.giltestnet.com/tx/${data.success.txHash}" target="blank">${receiver}</a>`,
+			  `1 ${selectedToken} has been successfully transferred to <a href="https://explorer.giltestnet.com/tx/${data.success.txHash}" target="blank">${receiver}</a>`,
 			  "success"
 			);
 		}).fail(function(err) {

@@ -6,19 +6,25 @@ textarea {
 }
 
 input {
-  transition: 0.3s border-color;
-  width: 100%;
-  border-radius: 3px;
-  box-sizing: border-box;
-  border: 1px solid #eee;
-
-  &:focus {
-    border-color: #992579 !important;
-  }
+  appearance: none;
+  margin-bottom: 20px;
+  width: 90%;
+  background: #f8f8f8;
+  color: #333;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  box-shadow: 0px 5px 7px -4px #000000;
+  transition: all 0.3s;
+  padding: 10px 30px 10px 10px;
+  position: relative;
+  
 }
 
-input {
-  padding: 0 15px;
-  height: 36px;
-  margin-bottom: 20px;
+input:focus {
+  outline: none;
+  box-shadow: 0 0 10px 4px #992579;
+}
+
+input:hover {
+  opacity: 0.9;
 }
